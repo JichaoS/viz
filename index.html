@@ -9,8 +9,6 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
-    <script src="js/d3.v3.js"></script>
-    <script src="js/underscore-min.js"></script>
     
     <meta charset="UTF-8">
   </head>
@@ -21,35 +19,42 @@
         <h1>JSON Visualization for the dReal Solver</h1> 
       </div> 
 
-      
-      <div id="chart" style="text-align:center">
-        <div id="drop_zone"> Drop your JSON file here</div>    
-      </div>
-    </div><!-- /.container -->    
-
+      <div id="drop_zone"> Drop your JSON file here</div>
+    
+    <script src="js/d3.v3.js"></script>
+    <script src="js/underscore-min.js"></script>
+    <div id="chart-container" style="text-align:center">   
+    </div>
+    </div>
+    
     <script>
+      var config;
       function handleDrop(e){
         e.stopPropagation();
         e.preventDefault();
         var file = e.dataTransfer.files[0];
-
+      
         if (!file.name.match('\.json')) {
           alert("Only .json files are accepted");
         }
         else{
           var reader = new FileReader();
           reader.onload = function(f){
+            document.getElementById('drop_zone').className = "hidden";
             json = reader.result;
-                document.getElementById("chart").innerHTML = json;            
             $.ajax({
-              url: 'http://localhost:8081',
-              data: '{"data":"' + "HELLo" + '"}',
+              url: 'http://gauss.modck.cs.cmu.edu:8081',
+              data: json,
               type: 'POST',
               success: function (data){
-                // document.getElementById("chart").innerHTML = data.msg;
+                config = { jsonfile:data, animation_delay:800, width:950, height:1000, inter_chart_margin:25, contextHeight:100, margin:{top:50, right:40, bottom:50, left:60}}; 
+	          var s2 = document.createElement('script');
+                  s2.setAttribute('type','text/javascript');
+                  s2.setAttribute('src', 'js/vis.js');
+                  $('#chart-container').append(s2);
               },
               error: function(xhr, status, error){
-                // document.getElementById("chart").innerHTML = error.message;
+                document.getElementById("chart-container").innerHTML = error.message;
               }
             });
           }
