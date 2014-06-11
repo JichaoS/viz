@@ -4,6 +4,7 @@ var http  = require('http'),
     fs    = require('fs'),
     sys   = require('sys'),
     util  = require('util'),
+    moment= require('moment'),
     spawn = require('child_process').spawn;
 
 server = http.createServer(function(request, response){
@@ -17,18 +18,12 @@ server = http.createServer(function(request, response){
 
   request.on('end', function(){
     var d = new Date();
-    dMonth = d.getMonth()+1;
-    dDate = d.getDate();
-    dYear = d.getFullYear();
-    dHour = ((d.getHours()+1)<12 ? d.getHours() : d.getHours()-12);
-    dMinutes = d.getMinutes();
-    dSeconds = d.getSeconds();
-    dM = ((d.getHours()+1)<12 ? 'AM' : 'PM');
-    df = dMonth + '-' + dDate + '-' + dYear +' '+dHour+"-"+dMinutes+'-'+dSeconds + dM;
-    json =  "/logs/"+ df +".json";
+    var ip = request.connection.remoteAddress;
+    df = moment().format("YYYYMMDD")+"_"+moment().format("HHmmss")+"_"+ip;
+    json =  df +".json";
 
-    fs.writeFile(__dirname + json, body + "\n");
-    response.end("http://gauss.modck.cs.cmu.edu/"+json);
+    fs.writeFile("/usr0/home/www-data/logs/viz/" + json, body + "\n");
+    response.end("http://gauss.modck.cs.cmu.edu/viz/"+json);
     body = '';
   });
   request.resume();
